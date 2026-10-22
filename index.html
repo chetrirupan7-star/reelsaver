@@ -1,0 +1,54 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ReelSaver</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;padding:20px;background:#f7f3fa;font-family:Arial,sans-serif;display:grid;place-items:center;min-height:100vh;color:#28202d}
+main{width:100%;max-width:420px;background:white;padding:26px;border-radius:20px;box-shadow:0 8px 30px #0001}
+h1{text-align:center;color:#d62976}
+p{color:#665d6b;line-height:1.5}
+input,button{width:100%;padding:14px;margin-top:12px;border-radius:10px;font-size:16px}
+input{border:1px solid #ddd}
+button{background:#d62976;color:white;border:0;font-weight:bold}
+#status{overflow-wrap:anywhere}
+</style>
+</head>
+<body>
+<main>
+<h1>📱 ReelSaver</h1>
+<p>Paste a public Instagram Reel link below.</p>
+<form id="form">
+<input id="url" type="url" placeholder="https://www.instagram.com/reel/..." required>
+<button type="submit">Check Reel Link</button>
+</form>
+<p id="status" role="status"></p>
+<button id="open" hidden type="button">Open Instagram Reel</button>
+<p>Only use videos you own or have permission to download.</p>
+</main>
+<script>
+const form=document.getElementById("form");
+const input=document.getElementById("url");
+const status=document.getElementById("status");
+const open=document.getElementById("open");
+form.addEventListener("submit",function(e){
+e.preventDefault();
+try{
+const u=new URL(input.value.trim());
+if(u.protocol!=="https:"||!["instagram.com","www.instagram.com"].includes(u.hostname)||!/^\/(reel|p|tv)\/[A-Za-z0-9_-]+\/?$/.test(u.pathname)){
+throw new Error("Please enter a valid Instagram Reel link.");
+}
+status.textContent="Link looks valid. Tap below to open the Reel.";
+open.hidden=false;
+open.onclick=()=>window.open(u.href,"_blank","noopener,noreferrer");
+}catch(err){
+status.textContent=err.message||"Please check the link.";
+open.hidden=true;
+}
+});
+</script>
+</body>
+</html>
