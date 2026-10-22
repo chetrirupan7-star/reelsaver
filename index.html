@@ -4,82 +4,103 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ReelSaver</title>
+<title>ReelSaver - Video Downloader</title>
 <style>
-*{box-sizing:border-box}
-body{margin:0;padding:20px;background:#f7f3fa;font-family:Arial,sans-serif;display:grid;place-items:center;min-height:100vh;color:#28202d}
-main{width:100%;max-width:420px;background:white;padding:26px;border-radius:20px;box-shadow:0 8px 30px #0001}
-h1{text-align:center;color:#d62976}
-p{color:#665d6b;line-height:1.5}
-input,button{width:100%;padding:14px;margin-top:12px;border-radius:10px;font-size:16px}
-input{border:1px solid #ddd}
-button{background:#d62976;color:white;border:0;font-weight:bold}
-#status{overflow-wrap:anywhere}
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  padding: 20px;
+  background: #f7f3fa;
+  font-family: Arial, sans-serif;
+  display: grid;
+  place-items: center;
+  min-height: 100vh;
+  color: #28202d;
+}
+main {
+  width: 100%;
+  max-width: 420px;
+  background: white;
+  padding: 26px;
+  border-radius: 20px;
+  box-shadow: 0 8px 30px #0001;
+}
+h1 { text-align: center; color: #d62976; }
+p { color: #665d6b; line-height: 1.5; }
+input, button {
+  width: 100%;
+  padding: 14px;
+  margin-top: 12px;
+  border-radius: 10px;
+  font-size: 16px;
+}
+input { border: 1px solid #ddd; }
+button {
+  background: #d62976;
+  color: white;
+  border: 0;
+  font-weight: bold;
+  cursor: pointer;
+}
+#status { overflow-wrap: anywhere; }
 </style>
 </head>
 <body>
 <main>
-<h1>📱 ReelSaver</h1>
-<p>Paste a public Instagram Reel link below.</p>
-<form id="form">
-<input id="url" type="url" placeholder="https://www.instagram.com/reel/..." required>
-<button type="submit">Check Reel Link</button>
-</form>
-<p id="status" role="status"></p>
-<button id="open" hidden type="button">Open Instagram Reel</button>
-<p>Only use videos you own or have permission to download.</p>
+  <h1>📱 ReelSaver</h1>
+  <p>Paste a direct video file link below to download a video you own or are authorized to save.</p>
+
+  <form id="form">
+    <input id="url" type="url"
+      placeholder="https://example.com/video.mp4" required>
+    <button type="submit">Download Video</button>
+  </form>
+
+  <p id="status" role="status" aria-live="polite"></p>
+  <p>Only download videos you own or have permission to save.</p>
 </main>
+
 <script>
-const form=document.getElementById("form");
-const input=document.getElementById("url");
-const status=document.getElementById("status");
-const open=document.getElementById("open");
-form.addEventListener("submit",function(e){
-e.preventDefault();
-try{
-const u=new URL(input.value.trim());
-if(u.protocol!=="https:"||!["instagram.com","www.instagram.com"].includes(u.hostname)||!/^\/(reel|p|tv)\/[A-Za-z0-9_-]+\/?$/.test(u.pathname)){
-throw new Error("Please enter a valid Instagram Reel link.");
-}
-status.textContent="Link looks valid. Tap below to open the Reel.";
-open.hidden=false;
-open.onclick=()=>window.open(u.href,"_blank","noopener,noreferrer");
-}catch(err){
-status.textContent=err.message||"Please check the link.";
-open.hidden=true;
-}
+const form = document.getElementById("form");
+const input = document.getElementById("url");
+const status = document.getElementById("status");
+
+form.addEventListener("submit", function(event) {
+  event.preventDefault();
+
+  let videoUrl;
+
+  try {
+    videoUrl = new URL(input.value.trim());
+
+    if (videoUrl.protocol !== "https:") {
+      throw new Error("Please use a secure HTTPS video link.");
+    }
+
+    if (!/\.(mp4|webm|mov)$/i.test(videoUrl.pathname)) {
+      throw new Error(
+        "Please enter a direct MP4, WebM, or MOV video file link."
+      );
+    }
+  } catch (error) {
+    status.textContent = error.message || "Please enter a valid video link.";
+    return;
+  }
+
+  status.textContent = "Opening video link...";
+
+  const link = document.createElement("a");
+  link.href = videoUrl.href;
+  link.target = "_blank";
+  link.rel = "noopener noreferrer";
+  link.download = "";
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+
+  status.textContent =
+    "Video link opened. The website hosting the video may control whether it downloads or plays in your browser.";
 });
 </script>
-
-
-
-<section style="max-width:500px;margin:30px auto;padding:20px;text-align:center;font-family:Arial,sans-serif;background:#fff;border-radius:16px;box-shadow:0 4px 18px #0001">
-  <h2>ReelSaver</h2>
-  <p>Download your own or authorized Instagram Reels</p>
-  <input id="reelUrl" type="url" placeholder="Paste Instagram Reel link here"
-    style="width:90%;padding:12px;border:1px solid #ccc;border-radius:8px;box-sizing:border-box">
-  <button onclick="openAuthorizedReel()"
-    style="width:90%;padding:12px;margin-top:12px;background:#1677ff;color:white;border:0;border-radius:8px;font-weight:bold">
-    Open Instagram Reel
-  </button>
-  <p id="reelMessage" style="font-size:14px;color:#444"></p>
-</section>
-<script>
-function openAuthorizedReel() {
-  const input = document.getElementById('reelUrl');
-  const message = document.getElementById('reelMessage');
-  try {
-    const url = new URL(input.value.trim());
-    if (url.protocol !== 'https:' ||
-        !['instagram.com', 'www.instagram.com'].includes(url.hostname)) {
-      throw new Error('invalid');
-    }
-    window.open(url.href, '_blank', 'noopener,noreferrer');
-    message.textContent = 'Instagram Reel opened. This button does not download the video.';
-  } catch {
-    message.textContent = 'Please enter a valid Instagram Reel URL.';
-  }
-}
-                </script>
 </body>
 </html>
