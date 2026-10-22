@@ -50,5 +50,36 @@ open.hidden=true;
 }
 });
 </script>
+
+
+
+<section style="max-width:500px;margin:30px auto;padding:20px;text-align:center;font-family:Arial,sans-serif;background:#fff;border-radius:16px;box-shadow:0 4px 18px #0001">
+  <h2>ReelSaver</h2>
+  <p>Download your own or authorized Instagram Reels</p>
+  <input id="reelUrl" type="url" placeholder="Paste Instagram Reel link here"
+    style="width:90%;padding:12px;border:1px solid #ccc;border-radius:8px;box-sizing:border-box">
+  <button onclick="openAuthorizedReel()"
+    style="width:90%;padding:12px;margin-top:12px;background:#1677ff;color:white;border:0;border-radius:8px;font-weight:bold">
+    Open Instagram Reel
+  </button>
+  <p id="reelMessage" style="font-size:14px;color:#444"></p>
+</section>
+<script>
+function openAuthorizedReel() {
+  const input = document.getElementById('reelUrl');
+  const message = document.getElementById('reelMessage');
+  try {
+    const url = new URL(input.value.trim());
+    if (url.protocol !== 'https:' ||
+        !['instagram.com', 'www.instagram.com'].includes(url.hostname)) {
+      throw new Error('invalid');
+    }
+    window.open(url.href, '_blank', 'noopener,noreferrer');
+    message.textContent = 'Instagram Reel opened. This button does not download the video.';
+  } catch {
+    message.textContent = 'Please enter a valid Instagram Reel URL.';
+  }
+}
+                </script>
 </body>
 </html>
